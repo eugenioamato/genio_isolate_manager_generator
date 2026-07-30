@@ -81,7 +81,7 @@ List<String> addImportStatements(
   }
 
   const newImportLine =
-      "import 'package:isolate_manager/isolate_manager.dart';";
+      "import 'package:genio_isolate_manager/genio_isolate_manager.dart';";
   if (!result.contains(newImportLine)) {
     result.insert(++lastImportIndex, newImportLine);
   }

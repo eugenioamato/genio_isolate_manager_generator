@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:isolate_manager/isolate_manager.dart';
+import 'package:genio_isolate_manager/genio_isolate_manager.dart';
 import 'package:isolate_manager_generator/src/generate_shared.dart' as shared;
 import 'package:isolate_manager_generator/src/generate_single.dart' as single;
 import 'package:isolate_manager_generator/src/model/exceptions.dart';

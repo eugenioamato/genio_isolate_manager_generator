@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:isolate_manager/isolate_manager.dart';
+import 'package:genio_isolate_manager/genio_isolate_manager.dart';
 import 'package:isolate_manager_generator/src/model/exceptions.dart';
 import 'package:isolate_manager_generator/src/utils.dart';
 import 'package:path/path.dart' as p;
@@ -182,7 +182,7 @@ Future<void> _generateFromAnnotatedFunction(List<dynamic> params) async {
   try {
     final content = <String>[
       "import '${p.basename(sourceFilePath)}';",
-      "import 'package:isolate_manager/isolate_manager.dart';",
+      "import 'package:genio_isolate_manager/genio_isolate_manager.dart';",
       '',
       'main() {',
     ];

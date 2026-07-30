@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:isolate_manager/isolate_manager.dart';
+import 'package:genio_isolate_manager/genio_isolate_manager.dart';
 import 'package:isolate_manager_generator/src/model/exceptions.dart';
 import 'package:isolate_manager_generator/src/utils.dart';
 import 'package:path/path.dart' as p;
@@ -149,7 +149,7 @@ Future<void> _generateFromAnnotatedFunctions(
 
   try {
     final content = <String>[
-      "import 'package:isolate_manager/isolate_manager.dart';",
+      "import 'package:genio_isolate_manager/genio_isolate_manager.dart';",
     ];
     for (final function in anotatedFunctions.entries) {
       final path = p.relative(function.value);
