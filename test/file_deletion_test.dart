@@ -1,0 +1,494 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as path;
+import 'package:test/test.dart';
+
+void main() {
+  group('File deletion defensive checks', () {
+    final outputDir = path.join('test', 'output');
+    final testInputDir = path.join('test');
+    final rootDir = Directory.current.path;
+
+    setUp(() {
+      // Ensure output directory exists before each test
+      Directory(outputDir).createSync(recursive: true);
+    });
+
+    tearDown(() async {
+      // Clean up output directory after each test
+      await _deleteDirectoryWithRetry(outputDir);
+
+      // Clean up temporary worker files in test directory
+      await _cleanupTempWorkerFiles(testInputDir);
+
+      // Clean up temporary shared worker files in root directory
+      await _cleanupTempSharedWorkerFiles(rootDir);
+
+      // Clean up non_existent_output directory if it exists
+      final nonExistentOutput = path.join(
+        'test',
+        'non_existent_output',
+      );
+      await _deleteDirectoryWithRetry(nonExistentOutput);
+    });
+
+    group('Existing output file deletion', () {
+      test(
+        'generate_single deletes existing output file before generation',
+        () async {
+          // Create output directory and an existing output file
+          Directory(outputDir).createSync(recursive: true);
+          final outputFile = File(path.join(outputDir, 'myWorkerFunction.js'));
+          const existingContent = 'existing content';
+          await outputFile.writeAsString(existingContent);
+          expect(
+            outputFile.existsSync(),
+            isTrue,
+            reason: 'Output file should exist before generation',
+          );
+
+          final process = await Process.run(
+            Platform.resolvedExecutable,
+            [
+              'run',
+              'isolate_manager_generator',
+              '--single',
+              '--input',
+              testInputDir,
+              '--output',
+              outputDir,
+              '--obfuscate',
+              '0',
+            ],
+          );
+
+          // Should complete successfully
+          // (file should be deleted and regenerated)
+          expect(
+            process.exitCode,
+            equals(0),
+            reason: 'Generation should complete successfully',
+          );
+          final compiledPath = path.join(
+            'test',
+            'output',
+            'myWorkerFunction.js',
+          );
+          expect(
+            process.stdout,
+            contains('Compiled: $compiledPath'),
+            reason: 'Should contain compilation success message',
+          );
+
+          // Verify the file was regenerated (not the old content)
+          expect(outputFile.existsSync(), isTrue);
+          final newContent = await outputFile.readAsString();
+          expect(
+            newContent,
+            isNot(equals(existingContent)),
+            reason: 'File should be regenerated with new content',
+          );
+        },
+      );
+
+      test(
+        'generate_shared deletes existing output file before generation',
+        () async {
+          // Create output directory and an existing output file
+          Directory(outputDir).createSync(recursive: true);
+          final outputFile = File(
+            path.join(outputDir, r'$shared_worker.js'),
+          );
+          const existingContent = 'existing content';
+          await outputFile.writeAsString(existingContent);
+          expect(
+            outputFile.existsSync(),
+            isTrue,
+            reason: 'Output file should exist before generation',
+          );
+
+          final process = await Process.run(
+            Platform.resolvedExecutable,
+            [
+              'run',
+              'isolate_manager_generator',
+              '--shared',
+              '--input',
+              testInputDir,
+              '--output',
+              outputDir,
+              '--obfuscate',
+              '0',
+            ],
+          );
+
+          // Should complete successfully
+          // (file should be deleted and regenerated)
+          expect(
+            process.exitCode,
+            equals(0),
+            reason: 'Shared generation should complete successfully',
+          );
+          final compiledPath = path.join(
+            'test',
+            'output',
+            r'$shared_worker.js',
+          );
+          expect(
+            process.stdout,
+            contains('Compiled: $compiledPath'),
+            reason: 'Should contain compilation success message',
+          );
+
+          // Verify the file was regenerated (not the old content)
+          expect(outputFile.existsSync(), isTrue);
+          final newContent = await outputFile.readAsString();
+          expect(
+            newContent,
+            isNot(equals(existingContent)),
+            reason: 'File should be regenerated with new content',
+          );
+        },
+      );
+
+      test(
+        'generate_single with wasm deletes existing .wasm file',
+        () async {
+          Directory(outputDir).createSync(recursive: true);
+          final outputFile = File(
+            path.join(outputDir, 'myWorkerFunction.wasm'),
+          );
+          const existingContent = 'existing wasm content';
+          await outputFile.writeAsBytes(
+            List<int>.generate(existingContent.length, (i) => i),
+          );
+          expect(outputFile.existsSync(), isTrue);
+
+          final process = await Process.run(
+            Platform.resolvedExecutable,
+            [
+              'run',
+              'isolate_manager_generator',
+              '--single',
+              '--input',
+              testInputDir,
+              '--output',
+              outputDir,
+              '--obfuscate',
+              '0',
+              '--wasm',
+            ],
+          );
+
+          // Should complete successfully
+          expect(process.exitCode, equals(0));
+          final compiledPath = path.join(
+            'test',
+            'output',
+            'myWorkerFunction.wasm',
+          );
+          expect(
+            process.stdout,
+            contains('Compiled: $compiledPath'),
+          );
+        },
+      );
+
+      test(
+        'generate_shared with wasm deletes existing .wasm file',
+        () async {
+          Directory(outputDir).createSync(recursive: true);
+          final outputFile = File(
+            path.join(outputDir, r'$shared_worker.wasm'),
+          );
+          const existingContent = 'existing wasm content';
+          await outputFile.writeAsBytes(
+            List<int>.generate(existingContent.length, (i) => i),
+          );
+          expect(outputFile.existsSync(), isTrue);
+
+          final process = await Process.run(
+            Platform.resolvedExecutable,
+            [
+              'run',
+              'isolate_manager_generator',
+              '--shared',
+              '--input',
+              testInputDir,
+              '--output',
+              outputDir,
+              '--obfuscate',
+              '0',
+              '--wasm',
+            ],
+          );
+
+          // Should complete successfully
+          expect(process.exitCode, equals(0));
+          final compiledPath = path.join(
+            'test',
+            'output',
+            r'$shared_worker.wasm',
+          );
+          expect(
+            process.stdout,
+            contains('Compiled: $compiledPath'),
+          );
+        },
+      );
+    });
+
+    group('Edge cases', () {
+      test(
+        'handles empty input directory gracefully',
+        () async {
+          final emptyDir = path.join('test', 'empty_input');
+          try {
+            Directory(emptyDir).createSync(recursive: true);
+
+            final process = await Process.run(
+              Platform.resolvedExecutable,
+              [
+                'run',
+                'isolate_manager_generator',
+                '--single',
+                '--input',
+                emptyDir,
+                '--output',
+                outputDir,
+                '--obfuscate',
+                '0',
+              ],
+            );
+
+            // Should complete without errors even with no annotated functions
+            expect(process.exitCode, equals(0));
+          } finally {
+            // Clean up the empty input directory
+            if (Directory(emptyDir).existsSync()) {
+              Directory(emptyDir).deleteSync(recursive: true);
+            }
+          }
+        },
+      );
+
+      test(
+        'handles non-existent output directory',
+        () async {
+          final nonExistentOutput = path.join(
+            'test',
+            'non_existent_output',
+            'nested',
+            'path',
+          );
+
+          // Ensure it doesn't exist
+          if (Directory(nonExistentOutput).existsSync()) {
+            Directory(nonExistentOutput).deleteSync(recursive: true);
+          }
+
+          final process = await Process.run(
+            Platform.resolvedExecutable,
+            [
+              'run',
+              'isolate_manager_generator',
+              '--single',
+              '--input',
+              testInputDir,
+              '--output',
+              nonExistentOutput,
+              '--obfuscate',
+              '0',
+            ],
+          );
+
+          // Should create the directory and complete successfully
+          expect(process.exitCode, equals(0));
+          expect(Directory(nonExistentOutput).existsSync(), isTrue);
+        },
+      );
+
+      test(
+        'handles multiple runs without file lock issues',
+        timeout: const Timeout(Duration(minutes: 2)),
+        () async {
+          // Run generation twice to ensure no file lock issues
+          for (var i = 0; i < 2; i++) {
+            final process = await Process.run(
+              Platform.resolvedExecutable,
+              [
+                'run',
+                'isolate_manager_generator',
+                '--single',
+                '--input',
+                testInputDir,
+                '--output',
+                outputDir,
+                '--obfuscate',
+                '0',
+              ],
+            );
+
+            expect(
+              process.exitCode,
+              equals(0),
+              reason: 'Run $i should complete successfully',
+            );
+          }
+        },
+      );
+
+      test(
+        'handles both single and shared generation together',
+        () async {
+          final process = await Process.run(
+            Platform.resolvedExecutable,
+            [
+              'run',
+              'isolate_manager_generator',
+              '--single',
+              '--shared',
+              '--input',
+              testInputDir,
+              '--output',
+              outputDir,
+              '--obfuscate',
+              '0',
+            ],
+          );
+
+          expect(process.exitCode, equals(0));
+          expect(
+            process.stdout,
+            contains('Compiled:'),
+            reason: 'Should compile at least one file',
+          );
+        },
+      );
+    });
+
+    group('Output file verification', () {
+      test(
+        'generates correct output files for single workers',
+        () async {
+          final process = await Process.run(
+            Platform.resolvedExecutable,
+            [
+              'run',
+              'isolate_manager_generator',
+              '--single',
+              '--input',
+              testInputDir,
+              '--output',
+              outputDir,
+              '--obfuscate',
+              '0',
+            ],
+          );
+
+          expect(process.exitCode, equals(0));
+
+          // Verify expected output files exist
+          final expectedFiles = [
+            'myWorkerFunction.js',
+            'myCustomWorkerFunction.js',
+            'myMultiWorkersFunction.js',
+          ];
+
+          for (final fileName in expectedFiles) {
+            final file = File(path.join(outputDir, fileName));
+            expect(
+              file.existsSync(),
+              isTrue,
+              reason: 'Expected output file $fileName to exist',
+            );
+          }
+        },
+      );
+
+      test(
+        'generates correct output files for shared workers',
+        () async {
+          final process = await Process.run(
+            Platform.resolvedExecutable,
+            [
+              'run',
+              'isolate_manager_generator',
+              '--shared',
+              '--input',
+              testInputDir,
+              '--output',
+              outputDir,
+              '--obfuscate',
+              '0',
+            ],
+          );
+
+          expect(process.exitCode, equals(0));
+
+          // Verify expected output file exists
+          final sharedWorkerFile = File(
+            path.join(outputDir, r'$shared_worker.js'),
+          );
+          expect(
+            sharedWorkerFile.existsSync(),
+            isTrue,
+            reason: 'Expected shared worker output file to exist',
+          );
+        },
+      );
+    });
+  });
+}
+
+Future<void> _deleteDirectoryWithRetry(String directoryPath) async {
+  final directory = Directory(directoryPath);
+  if (!directory.existsSync()) {
+    return;
+  }
+
+  const maxAttempts = 5;
+  for (var attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      await directory.delete(recursive: true);
+      return;
+    } on FileSystemException catch (_) {
+      if (attempt == maxAttempts - 1) {
+        rethrow;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+  }
+}
+
+Future<void> _cleanupTempWorkerFiles(String directoryPath) async {
+  final directory = Directory(directoryPath);
+  if (!directory.existsSync()) {
+    return;
+  }
+
+  for (final entity in directory.listSync()) {
+    final name = path.basename(entity.path);
+    if (name.startsWith('.IsolateManagerWorker.')) {
+      if (entity is File && entity.existsSync()) {
+        await entity.delete();
+      }
+    }
+  }
+}
+
+Future<void> _cleanupTempSharedWorkerFiles(String directoryPath) async {
+  final directory = Directory(directoryPath);
+  if (!directory.existsSync()) {
+    return;
+  }
+
+  for (final entity in directory.listSync()) {
+    final name = path.basename(entity.path);
+    if (name.startsWith('.IsolateManagerShared.')) {
+      if (entity is File && entity.existsSync()) {
+        await entity.delete();
+      }
+    }
+  }
+}
