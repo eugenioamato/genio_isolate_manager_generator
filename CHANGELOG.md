@@ -1,3 +1,11 @@
+## 1.0.0
+
+* Initial release as genio_isolate_manager_generator
+* Forked from isolate_manager_generator with Flutter 3.44.8 compatibility
+* Simplified architecture for easier maintenance
+* Updated package name to genio_isolate_manager_generator
+* Updated to depend on genio_isolate_manager ^1.0.0
+
 ## 0.4.2
 
 * Supports pubspec configuration:
