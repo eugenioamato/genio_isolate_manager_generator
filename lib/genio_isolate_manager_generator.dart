@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:genio_isolate_manager/genio_isolate_manager.dart';
-import 'package:isolate_manager_generator/src/generate_shared.dart' as shared;
-import 'package:isolate_manager_generator/src/generate_single.dart' as single;
-import 'package:isolate_manager_generator/src/model/exceptions.dart';
-import 'package:isolate_manager_generator/src/utils.dart';
+import 'package:genio_isolate_manager_generator/src/generate_shared.dart' as shared;
+import 'package:genio_isolate_manager_generator/src/generate_single.dart' as single;
+import 'package:genio_isolate_manager_generator/src/model/exceptions.dart';
+import 'package:genio_isolate_manager_generator/src/utils.dart';
 import 'package:path/path.dart';
 
 /// A utility class for generating isolate manager workers.
-class IsolateManagerGenerator {
+class GenioIsolateManagerGenerator {
   /// Resolves effective dart args from CLI and pubspec config.
   ///
   /// Pubspec `dart-args` are prepended so CLI dart args keep higher priority.

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:isolate_manager_generator/src/utils.dart';
+import 'package:genio_isolate_manager_generator/src/utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
@@ -48,7 +48,7 @@ void main() {
         Platform.resolvedExecutable,
         [
           'run',
-          'isolate_manager_generator',
+          'genio_isolate_manager_generator',
           '--input',
           'test',
           '--output',

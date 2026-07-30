@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:isolate_manager_generator/isolate_manager_generator.dart';
+import 'package:genio_isolate_manager_generator/genio_isolate_manager_generator.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('Main test', () {
     test('listDartFiles', () {
       final files = <File>[];
-      final dartFiles = IsolateManagerGenerator.listDartFiles(
+      final dartFiles = GenioIsolateManagerGenerator.listDartFiles(
         Directory('test'),
         files,
       );
@@ -16,7 +16,7 @@ void main() {
     });
 
     test('resolveDartArgs prepends pubspec args before CLI args', () {
-      final result = IsolateManagerGenerator.resolveDartArgs(
+      final result = GenioIsolateManagerGenerator.resolveDartArgs(
         {
           'dart-args': ['--no-source-maps', '--enable-asserts'],
         },
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('resolveDartArgs falls back to pubspec config', () {
-      final result = IsolateManagerGenerator.resolveDartArgs(
+      final result = GenioIsolateManagerGenerator.resolveDartArgs(
         {
           'dart-args': ['--no-source-maps'],
         },

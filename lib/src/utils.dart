@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:isolate_manager_generator/src/model/exceptions.dart';
+import 'package:genio_isolate_manager_generator/src/model/exceptions.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 

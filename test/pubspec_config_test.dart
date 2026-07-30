@@ -66,7 +66,7 @@ void notAWorkerFunction() {
 
         final process = await Process.run(
           Platform.resolvedExecutable,
-          ['run', p.join(repoRoot, 'bin', 'isolate_manager_generator.dart')],
+          ['run', p.join(repoRoot, 'bin', 'genio_isolate_manager_generator.dart')],
           workingDirectory: tmp.path,
         );
 

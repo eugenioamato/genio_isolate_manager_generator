@@ -51,7 +51,7 @@ void main() {
             Platform.resolvedExecutable,
             [
               'run',
-              'isolate_manager_generator',
+              'genio_isolate_manager_generator',
               '--single',
               '--input',
               testInputDir,
@@ -111,7 +111,7 @@ void main() {
             Platform.resolvedExecutable,
             [
               'run',
-              'isolate_manager_generator',
+              'genio_isolate_manager_generator',
               '--shared',
               '--input',
               testInputDir,
@@ -168,7 +168,7 @@ void main() {
             Platform.resolvedExecutable,
             [
               'run',
-              'isolate_manager_generator',
+              'genio_isolate_manager_generator',
               '--single',
               '--input',
               testInputDir,
@@ -211,7 +211,7 @@ void main() {
             Platform.resolvedExecutable,
             [
               'run',
-              'isolate_manager_generator',
+              'genio_isolate_manager_generator',
               '--shared',
               '--input',
               testInputDir,
@@ -250,7 +250,7 @@ void main() {
               Platform.resolvedExecutable,
               [
                 'run',
-                'isolate_manager_generator',
+                'genio_isolate_manager_generator',
                 '--single',
                 '--input',
                 emptyDir,
@@ -291,7 +291,7 @@ void main() {
             Platform.resolvedExecutable,
             [
               'run',
-              'isolate_manager_generator',
+              'genio_isolate_manager_generator',
               '--single',
               '--input',
               testInputDir,
@@ -318,7 +318,7 @@ void main() {
               Platform.resolvedExecutable,
               [
                 'run',
-                'isolate_manager_generator',
+                'genio_isolate_manager_generator',
                 '--single',
                 '--input',
                 testInputDir,
@@ -345,7 +345,7 @@ void main() {
             Platform.resolvedExecutable,
             [
               'run',
-              'isolate_manager_generator',
+              'genio_isolate_manager_generator',
               '--single',
               '--shared',
               '--input',
@@ -375,7 +375,7 @@ void main() {
             Platform.resolvedExecutable,
             [
               'run',
-              'isolate_manager_generator',
+              'genio_isolate_manager_generator',
               '--single',
               '--input',
               testInputDir,
@@ -413,7 +413,7 @@ void main() {
             Platform.resolvedExecutable,
             [
               'run',
-              'isolate_manager_generator',
+              'genio_isolate_manager_generator',
               '--shared',
               '--input',
               testInputDir,
