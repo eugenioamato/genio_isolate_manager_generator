@@ -1,7 +1,7 @@
 // This is a test file for isolate_manager annotations.
 // ignore_for_file: avoid_print
 
-import 'package:isolate_manager/isolate_manager.dart';
+import 'package:genio_isolate_manager/genio_isolate_manager.dart';
 
 @isolateManagerWorker
 void myWorkerFunction(String message) {

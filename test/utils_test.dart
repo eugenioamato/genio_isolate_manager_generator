@@ -112,14 +112,14 @@ void main() {
 
       expect(
         result,
-        contains("import 'package:isolate_manager/isolate_manager.dart';"),
+        contains("import 'package:genio_isolate_manager/genio_isolate_manager.dart';"),
       );
     });
 
     test('does not add duplicate isolate_manager import', () {
       final content = [
         'import "dart:io";',
-        "import 'package:isolate_manager/isolate_manager.dart';",
+        "import 'package:genio_isolate_manager/genio_isolate_manager.dart';",
         'void main() {}',
       ];
       final result = addImportStatements(
@@ -132,7 +132,7 @@ void main() {
         result
             .where(
               (l) =>
-                  l == "import 'package:isolate_manager/isolate_manager.dart';",
+                  l == "import 'package:genio_isolate_manager/genio_isolate_manager.dart';",
             )
             .length,
         equals(1),
@@ -171,7 +171,7 @@ void main() {
 
       expect(
         result[0],
-        equals("import 'package:isolate_manager/isolate_manager.dart';"),
+        equals("import 'package:genio_isolate_manager/genio_isolate_manager.dart';"),
       );
     });
 
@@ -191,7 +191,7 @@ void main() {
       expect(result[1], equals('import "dart:async";'));
       expect(
         result[2],
-        equals("import 'package:isolate_manager/isolate_manager.dart';"),
+        equals("import 'package:genio_isolate_manager/genio_isolate_manager.dart';"),
       );
     });
 
@@ -475,7 +475,7 @@ void main() {
       final content = await File(tempMainPath).readAsLines();
       expect(
         content,
-        contains("import 'package:isolate_manager/isolate_manager.dart';"),
+        contains("import 'package:genio_isolate_manager/genio_isolate_manager.dart';"),
       );
       expect(content, contains("import 'source.dart';"));
       expect(content, contains('  _addWorkerMappings();'));
